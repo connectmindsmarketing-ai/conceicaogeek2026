@@ -14,7 +14,7 @@
         
         body {
             background-color: #020617; color: #f8fafc; font-family: 'Poppins', sans-serif;
-            overflow: hidden; height: 100vh; width: 100vw; display: flex; flex-direction: column; position: relative;
+            overflow-x: hidden; height: 100vh; width: 100vw; display: flex; flex-direction: column; position: relative;
         }
 
         /* Efeito de Malha Cyber ao fundo */
@@ -29,16 +29,16 @@
         /* 2. TELA DE CAPA (INICIAL) */
         #cover-screen {
             position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
-            background-color: #020617; z-index: 1000; display: flex; align-items: center; justify-content: center;
+            background-color: #020617; z-index: 1000; display: flex; flex-direction: row;
+            align-items: center; justify-content: center;
             transition: transform 0.8s cubic-bezier(0.87, 0, 0.13, 1);
         }
         #cover-screen.hidden { transform: translateY(-100%); }
-        .cover-left { width: 35%; height: 100%; }
+        .cover-left { width: 35%; height: 100%; display: block; }
         .cover-left img { width: 100%; height: 100%; object-fit: cover; }
         .cover-right { width: 65%; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 40px; }
         
-        /* Título do Evento Ampliado */
-        .cover-right h1 { font-size: 130px; font-weight: 900; line-height: 0.9; margin-bottom: 20px; letter-spacing: -4px; }
+        .cover-right h1 { font-size: 110px; font-weight: 900; line-height: 0.9; margin-bottom: 20px; letter-spacing: -4px; }
         .cover-right h1 span { color: #22c55e; }
         .cover-right .event-subtitle { font-family: 'Space Mono', monospace; font-size: 28px; color: #38bdf8; margin-bottom: 20px; }
         .cover-right .speaker-name { font-size: 34px; font-weight: 700; color: #f8fafc; margin-bottom: 50px; border-top: 1px solid #1e293b; padding-top: 20px; min-width: 300px; }
@@ -51,6 +51,7 @@
         .logo h1 { font-weight: 900; font-size: 32px; letter-spacing: -1px; }
         .logo span { color: #22c55e; }
         .subtitle { font-family: 'Space Mono', monospace; color: #38bdf8; font-size: 14px; margin-top: -5px; }
+        .header-speaker { font-family: 'Space Mono'; font-weight: bold; color: #64748b; }
 
         /* Botão Voltar para Capa (Canto Inferior Esquerdo) */
         #back-to-cover {
@@ -61,8 +62,8 @@
         }
         #back-to-cover:hover { background: #22c55e; color: #020617; border-color: #22c55e; transform: scale(1.1); }
 
-        /* Linha do Tempo Estilizada */
-        main { flex-grow: 1; display: flex; align-items: center; justify-content: center; position: relative; z-index: 5; }
+        /* Linha do Tempo Principal */
+        main { flex-grow: 1; display: flex; align-items: center; justify-content: center; position: relative; z-index: 5; padding: 20px; }
         .timeline { width: 80%; height: 6px; background: #1e293b; border-radius: 3px; display: flex; justify-content: space-between; align-items: center; position: relative; }
         .node {
             width: 90px; height: 90px; background: #0f172a; border: 4px solid #38bdf8; border-radius: 50%;
@@ -98,7 +99,7 @@
         .text-side li { font-size: 19px; margin-bottom: 15px; list-style: none; padding-left: 40px; position: relative; color: #cbd5e1; line-height: 1.4; }
         .text-side li i { position: absolute; left: 0; top: 4px; color: #22c55e; font-size: 20px; }
 
-        /* Ajuste de Espaço e Dimensões das Imagens Solicitadas */
+        /* Imagens */
         .image-side { background: #1e293b; border-radius: 20px; overflow: hidden; border: 1px solid #334155; height: 100%; min-height: 350px; display: flex; align-items: center; justify-content: center; }
         .image-side img { max-width: 100%; max-height: 100%; object-fit: contain; display: block; }
 
@@ -110,7 +111,7 @@
         .pole h3 { font-size: 28px; margin-bottom: 25px; display: flex; align-items: center; gap: 15px; }
         .pole li { font-size: 19px; margin-bottom: 20px; list-style: none; display: flex; align-items: center; gap: 12px; color: #cbd5e1; }
 
-        /* Popup de Segurança Perfeitamente Centralizado e Vertical */
+        /* Popup de Segurança Perfeitamente Centralizado */
         .sub-modal-content { 
             background: #1e293b; width: 550px; max-width: 90vw; padding: 50px; 
             border: 2px solid #f59e0b; border-radius: 24px; position: relative;
@@ -141,10 +142,87 @@
         .tips-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 30px; }
         .tip { background: rgba(30, 41, 59, 0.7); padding: 30px; border-radius: 16px; border-left: 6px solid #38bdf8; }
         .tip h4 { color: #22c55e; font-family: 'Space Mono'; margin-bottom: 10px; font-size: 22px; }
+        .tip p { font-size: 16px; color: #cbd5e1; line-height: 1.5; }
         .contact-card { text-align: center; background: rgba(15, 23, 42, 0.9); padding: 50px; border-radius: 30px; border: 2px solid #22c55e; display: inline-block; width: 100%; }
 
         @keyframes slideUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+        /* ==========================================================================
+           9. REGRAS RECOMPILADAS DE DESIGN RESPONSIVO (MEDIA QUERIES PARA MOBILE)
+           ========================================================================== */
+        @media (max-width: 900px) {
+            /* Permite rolagem na página se o conteúdo vazar */
+            body { overflow: auto; height: auto; }
+            
+            /* CAPA MOBILE */
+            #cover-screen { flex-direction: column; overflow-y: auto; justify-content: flex-start; padding: 30px 15px; }
+            .cover-left { width: 100%; height: 40vh; max-height: 300px; margin-bottom: 20px; border-radius: 16px; overflow: hidden; }
+            .cover-right { width: 100%; padding: 0; }
+            .cover-right h1 { font-size: 52px; letter-spacing: -2px; margin-bottom: 15px; }
+            .cover-right .event-subtitle { font-size: 20px; }
+            .cover-right .speaker-name { font-size: 24px; margin-bottom: 35px; padding-top: 15px; }
+            .start-btn { font-size: 18px; padding: 15px 30px; width: 100%; justify-content: center; }
+
+            /* TOPO HEADER MOBILE */
+            header { padding: 15px 20px; flex-direction: column; gap: 5px; text-align: center; }
+            .logo h1 { font-size: 26px; }
+            .header-speaker { display: none; } /* Oculta o nome no topo para economizar espaço */
+
+            /* TIMELINE MOBILE (Muda para Vertical ou Ajusta Nós) */
+            main { padding: 60px 20px; }
+            .timeline { width: 6px; height: 70vh; flex-direction: column; }
+            .node { width: 70px; height: 70px; }
+            .node i { font-size: 26px; }
+            .node-label { top: 20px; left: 90px; font-size: 16px; }
+
+            /* MODAIS GERAIS MOBILE */
+            .modal-content { width: 96vw; height: 92vh; padding: 25px 15px; border-radius: 16px; }
+            .close-btn { top: 15px; right: 20px; font-size: 35px; }
+            .modal-title { font-size: 24px; margin-bottom: 20px; padding-left: 10px; border-left-width: 6px; }
+
+            /* LAYOUT INTERNO DOS MODAIS (Muda de colunas para linhas) */
+            .dash-layout { grid-template-columns: 1fr; gap: 20px; }
+            .menu-col { flex-direction: row; gap: 10px; overflow-x: auto; padding-bottom: 5px; -webkit-overflow-scrolling: touch; }
+            .tab-btn { padding: 12px 20px; font-size: 15px; border-radius: 10px; white-space: nowrap; gap: 10px; }
+            .tab-btn i { font-size: 18px; }
+
+            /* PAINEL DE CONTEÚDO MOBILE */
+            .content-col { padding: 15px; border-radius: 12px; }
+            .tab-panel { grid-template-columns: 1fr; gap: 20px; }
+            .text-side h3 { font-size: 22px; margin-bottom: 15px; }
+            .text-side li { font-size: 16px; margin-bottom: 12px; padding-left: 30px; }
+            .text-side li i { font-size: 16px; top: 3px; }
+            .image-side { min-height: 220px; max-height: 280px; border-radius: 12px; }
+
+            /* FLASHCARDS MITOS X FATOS MOBILE */
+            .cards-grid { grid-template-columns: 1fr; gap: 15px; overflow-y: auto; padding-bottom: 20px; }
+            .card { height: 180px; }
+            .card-front h3 { font-size: 18px; }
+            .card-back p { font-size: 15px; }
+
+            /* MULTIVERSO DIGITAL MOBILE */
+            .multiverso-container { grid-template-columns: 1fr; gap: 20px; overflow-y: auto; }
+            .pole { padding: 25px; }
+            .pole h3 { font-size: 22px; margin-bottom: 15px; }
+            .pole li { font-size: 15px; margin-bottom: 10px; }
+            .advance-btn { font-size: 18px; padding: 15px 30px; width: 100%; justify-content: center; }
+
+            /* POPUPS DE SEGURANÇA MOBILE */
+            .sub-modal-content { padding: 30px 20px; width: 90vw; }
+            .sub-modal-content h3 { font-size: 20px; }
+
+            /* CONSIDERAÇÕES FINAIS MOBILE */
+            .tips-grid { grid-template-columns: 1fr; gap: 15px; }
+            .tip { padding: 20px; }
+            .tip h4 { font-size: 18px; }
+            .tip p { font-size: 15px; }
+            .contact-card { padding: 30px 15px; border-radius: 20px; }
+            .contact-card h2 { font-size: 32px; }
+            .contact-card p { font-size: 18px; margin-bottom: 25px; }
+            .contact-card h3 { font-size: 24px; }
+            .contact-card p i { font-size: 18px; }
+        }
     </style>
 </head>
 <body>
@@ -168,7 +246,7 @@
             <h1>CONCEIÇÃO <span>GEEK</span></h1>
             <p class="subtitle">A Semana do Orgulho Nerd | Palestrante Convidado</p>
         </div>
-        <div style="font-family: 'Space Mono'; font-weight: bold; color: #64748b;">
+        <div class="header-speaker">
             <i class="fa-solid fa-microphone-lines"></i> Laércio Prates
         </div>
     </header>
@@ -201,13 +279,13 @@
             <div class="dash-layout">
                 <div class="menu-col">
                     <button class="tab-btn active" onclick="switchTab(event, 't-prof', 'analogico')">
-                        <i class="fa-solid fa-chalkboard"></i> A Vida dos Professores
+                        <i class="fa-solid fa-chalkboard"></i> Professores
                     </button>
                     <button class="tab-btn" onclick="switchTab(event, 't-banco', 'analogico')">
-                        <i class="fa-solid fa-building-columns"></i> A Saga Bancária
+                        <i class="fa-solid fa-building-columns"></i> Bancos
                     </button>
                     <button class="tab-btn" onclick="switchTab(event, 't-med', 'analogico')">
-                        <i class="fa-solid fa-stethoscope"></i> Medicina Raiz
+                        <i class="fa-solid fa-stethoscope"></i> Medicina
                     </button>
                 </div>
                 <div class="content-col">
