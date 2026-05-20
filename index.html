@@ -1,0 +1,430 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Conceição Geek - Do Analógico ao Digital</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;700;900&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        /* 1. CONFIGURAÇÕES GERAIS E FUNDO */
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        
+        body {
+            background-color: #020617; color: #f8fafc; font-family: 'Poppins', sans-serif;
+            overflow: hidden; height: 100vh; width: 100vw; display: flex; flex-direction: column; position: relative;
+        }
+
+        /* Efeito de Malha Cyber ao fundo */
+        body::before {
+            content: ''; position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+            background-image: 
+                linear-gradient(to right, rgba(34, 197, 94, 0.05) 1px, transparent 1px),
+                linear-gradient(to bottom, rgba(34, 197, 94, 0.05) 1px, transparent 1px);
+            background-size: 60px 60px; z-index: -1; pointer-events: none;
+        }
+
+        /* 2. TELA DE CAPA (INICIAL) */
+        #cover-screen {
+            position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+            background-color: #020617; z-index: 1000; display: flex; align-items: center; justify-content: center;
+            transition: transform 0.8s cubic-bezier(0.87, 0, 0.13, 1);
+        }
+        #cover-screen.hidden { transform: translateY(-100%); }
+        .cover-left { width: 35%; height: 100%; }
+        .cover-left img { width: 100%; height: 100%; object-fit: cover; }
+        .cover-right { width: 65%; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 40px; }
+        
+        /* Título do Evento Ampliado */
+        .cover-right h1 { font-size: 130px; font-weight: 900; line-height: 0.9; margin-bottom: 20px; letter-spacing: -4px; }
+        .cover-right h1 span { color: #22c55e; }
+        .cover-right .event-subtitle { font-family: 'Space Mono', monospace; font-size: 28px; color: #38bdf8; margin-bottom: 20px; }
+        .cover-right .speaker-name { font-size: 34px; font-weight: 700; color: #f8fafc; margin-bottom: 50px; border-top: 1px solid #1e293b; padding-top: 20px; min-width: 300px; }
+
+        /* 3. NAVEGAÇÃO E HEADER PRINCIPAL */
+        header {
+            padding: 20px 60px; display: flex; justify-content: space-between; align-items: center;
+            border-bottom: 1px solid #1e293b; background: rgba(2, 6, 23, 0.9); position: relative; z-index: 10;
+        }
+        .logo h1 { font-weight: 900; font-size: 32px; letter-spacing: -1px; }
+        .logo span { color: #22c55e; }
+        .subtitle { font-family: 'Space Mono', monospace; color: #38bdf8; font-size: 14px; margin-top: -5px; }
+
+        /* Botão Voltar para Capa (Canto Inferior Esquerdo) */
+        #back-to-cover {
+            position: fixed; bottom: 30px; left: 30px; width: 50px; height: 50px;
+            background: rgba(30, 41, 59, 0.5); border: 1px solid #334155; border-radius: 12px;
+            color: #94a3b8; display: flex; align-items: center; justify-content: center;
+            cursor: pointer; z-index: 50; transition: 0.3s;
+        }
+        #back-to-cover:hover { background: #22c55e; color: #020617; border-color: #22c55e; transform: scale(1.1); }
+
+        /* Linha do Tempo Estilizada */
+        main { flex-grow: 1; display: flex; align-items: center; justify-content: center; position: relative; z-index: 5; }
+        .timeline { width: 80%; height: 6px; background: #1e293b; border-radius: 3px; display: flex; justify-content: space-between; align-items: center; position: relative; }
+        .node {
+            width: 90px; height: 90px; background: #0f172a; border: 4px solid #38bdf8; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center; cursor: pointer; transition: 0.4s;
+            box-shadow: 0 0 20px rgba(56, 189, 248, 0.2); position: relative;
+        }
+        .node i { font-size: 36px; color: #f8fafc; pointer-events: none; }
+        .node:hover { transform: translateY(-5px) scale(1.1); border-color: #22c55e; box-shadow: 0 0 35px rgba(34, 197, 94, 0.5); }
+        .node-label { position: absolute; top: -55px; white-space: nowrap; font-family: 'Space Mono', monospace; font-weight: 700; color: #64748b; font-size: 18px; transition: 0.3s; pointer-events: none; }
+        .node:hover .node-label { color: #22c55e; }
+
+        /* 4. DESIGN DOS MODAIS */
+        .modal, .sub-modal { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(2, 6, 23, 0.98); display: flex; align-items: center; justify-content: center; opacity: 0; pointer-events: none; transition: 0.3s ease; z-index: 100; }
+        .modal.active, .sub-modal.active { opacity: 1; pointer-events: all; }
+        
+        .modal-content { background: #0f172a; width: 92vw; height: 88vh; border: 1px solid #334155; border-radius: 24px; padding: 45px; position: relative; display: flex; flex-direction: column; box-shadow: 0 30px 100px rgba(0,0,0,0.7); overflow: hidden; }
+        .close-btn { position: absolute; top: 30px; right: 35px; font-size: 40px; color: #ef4444; cursor: pointer; z-index: 20; }
+        .modal-title { font-size: 42px; color: #22c55e; margin-bottom: 30px; text-transform: uppercase; border-left: 10px solid #22c55e; padding-left: 20px; line-height: 1; }
+
+        /* Painel Dashboard (Menu + Conteúdo) */
+        .dash-layout { display: grid; grid-template-columns: 340px 1fr; gap: 40px; height: 100%; flex-grow: 1; overflow: hidden; }
+        .menu-col { display: flex; flex-direction: column; gap: 20px; }
+        .tab-btn { background: #1e293b; border: 2px solid transparent; color: #94a3b8; padding: 25px; border-radius: 16px; cursor: pointer; text-align: left; font-size: 20px; font-weight: 700; transition: 0.3s; display: flex; align-items: center; gap: 20px; }
+        .tab-btn.active { background: rgba(34, 197, 94, 0.1); border-color: #22c55e; color: #fff; }
+        .tab-btn i { font-size: 28px; color: #38bdf8; }
+        .tab-btn.active i { color: #22c55e; }
+
+        .content-col { background: rgba(2, 6, 23, 0.5); border-radius: 16px; padding: 30px; overflow-y: auto; }
+        .tab-panel { display: none; grid-template-columns: 1fr 1fr; gap: 30px; animation: slideUp 0.5s ease forwards; }
+        .tab-panel.active { display: grid; }
+
+        .text-side h3 { font-family: 'Space Mono'; font-size: 32px; color: #38bdf8; margin-bottom: 25px; }
+        .text-side li { font-size: 19px; margin-bottom: 15px; list-style: none; padding-left: 40px; position: relative; color: #cbd5e1; line-height: 1.4; }
+        .text-side li i { position: absolute; left: 0; top: 4px; color: #22c55e; font-size: 20px; }
+
+        /* Ajuste de Espaço e Dimensões das Imagens Solicitadas */
+        .image-side { background: #1e293b; border-radius: 20px; overflow: hidden; border: 1px solid #334155; height: 100%; min-height: 350px; display: flex; align-items: center; justify-content: center; }
+        .image-side img { max-width: 100%; max-height: 100%; object-fit: contain; display: block; }
+
+        /* 5. MULTIVERSO DIGITAL */
+        .multiverso-container { display: grid; grid-template-columns: 1fr 1fr; gap: 40px; margin-top: 10px; }
+        .pole { background: #1e293b; border-radius: 20px; padding: 40px; border-top: 8px solid; display: flex; flex-direction: column; }
+        .pole-opps { border-color: #22c55e; }
+        .pole-risks { border-color: #ef4444; }
+        .pole h3 { font-size: 28px; margin-bottom: 25px; display: flex; align-items: center; gap: 15px; }
+        .pole li { font-size: 19px; margin-bottom: 20px; list-style: none; display: flex; align-items: center; gap: 12px; color: #cbd5e1; }
+
+        /* Popup de Segurança Perfeitamente Centralizado e Vertical */
+        .sub-modal-content { 
+            background: #1e293b; width: 550px; max-width: 90vw; padding: 50px; 
+            border: 2px solid #f59e0b; border-radius: 24px; position: relative;
+            box-shadow: 0 0 80px rgba(245, 158, 11, 0.2);
+            display: flex; flex-direction: column; align-items: center;
+        }
+
+        /* 6. DESAFIO FLASHCARDS (MITOS X FATOS) */
+        .cards-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 25px; }
+        .card { background: transparent; height: 280px; perspective: 1000px; cursor: pointer; }
+        .card-inner { position: relative; width: 100%; height: 100%; text-align: center; transition: transform 0.6s; transform-style: preserve-3d; }
+        .card.flipped .card-inner { transform: rotateY(180deg); }
+        .card-front, .card-back { position: absolute; width: 100%; height: 100%; backface-visibility: hidden; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 25px; border-radius: 20px; border: 2px solid #334155; }
+        .card-front { background: #1e293b; }
+        .card-back { background: #0f172a; transform: rotateY(180deg); }
+        .status { padding: 6px 16px; border-radius: 30px; font-weight: 900; font-size: 14px; text-transform: uppercase; margin-bottom: 15px; color: white; }
+        .status.mito { background: #ef4444; }
+        .status.fato { background: #22c55e; }
+
+        /* 7. BOTÕES GERAIS DOS MODAIS */
+        .advance-btn, .start-btn, .safety-btn { background: #22c55e; color: #020617; border: none; padding: 18px 45px; font-size: 22px; font-weight: 900; border-radius: 12px; cursor: pointer; font-family: 'Space Mono'; text-transform: uppercase; transition: 0.3s; display: inline-flex; align-items: center; gap: 10px; }
+        .advance-btn:hover, .start-btn:hover, .safety-btn:hover { background: #38bdf8; color: #fff; transform: translateY(-5px); }
+        .safety-btn { background: #f59e0b; width: 100%; margin-top: 20px; font-size: 18px; padding: 15px; justify-content: center; }
+
+        /* 8. ETAPAS DE CONSIDERAÇÕES FINAIS */
+        .step { display: none; }
+        .step.active { display: block; animation: fadeIn 0.6s ease; }
+        .tips-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 30px; }
+        .tip { background: rgba(30, 41, 59, 0.7); padding: 30px; border-radius: 16px; border-left: 6px solid #38bdf8; }
+        .tip h4 { color: #22c55e; font-family: 'Space Mono'; margin-bottom: 10px; font-size: 22px; }
+        .contact-card { text-align: center; background: rgba(15, 23, 42, 0.9); padding: 50px; border-radius: 30px; border: 2px solid #22c55e; display: inline-block; width: 100%; }
+
+        @keyframes slideUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+    </style>
+</head>
+<body>
+
+    <div id="cover-screen">
+        <div class="cover-left"><img src="capa.jpg" alt="Capa"></div>
+        <div class="cover-right">
+            <h1>CONCEIÇÃO <span>GEEK</span></h1>
+            <p class="event-subtitle">Do Analógico ao Digital</p>
+            <p class="speaker-name">Laércio Prates</p>
+            <button class="start-btn" onclick="startPresentation()">Navegar na linha do tempo</button>
+        </div>
+    </div>
+
+    <div id="back-to-cover" onclick="backToCover()" title="Voltar para a Capa">
+        <i class="fa-solid fa-arrow-left"></i>
+    </div>
+
+    <header>
+        <div class="logo">
+            <h1>CONCEIÇÃO <span>GEEK</span></h1>
+            <p class="subtitle">A Semana do Orgulho Nerd | Palestrante Convidado</p>
+        </div>
+        <div style="font-family: 'Space Mono'; font-weight: bold; color: #64748b;">
+            <i class="fa-solid fa-microphone-lines"></i> Laércio Prates
+        </div>
+    </header>
+
+    <main>
+        <div class="timeline">
+            <div class="node" onclick="openModal('m-analogico')">
+                <span class="node-label">Era Analógica</span>
+                <i class="fa-solid fa-tape"></i>
+            </div>
+            <div class="node" onclick="openModal('m-transicao')">
+                <span class="node-label">A Transição</span>
+                <i class="fa-solid fa-shuffle"></i>
+            </div>
+            <div class="node" onclick="openModal('m-mitos')">
+                <span class="node-label">Mitos x Fatos</span>
+                <i class="fa-solid fa-gamepad"></i>
+            </div>
+            <div class="node" onclick="openModal('m-futuro')">
+                <span class="node-label">Multiverso Digital</span>
+                <i class="fa-solid fa-globe"></i>
+            </div>
+        </div>
+    </main>
+
+    <div class="modal" id="m-analogico">
+        <div class="modal-content">
+            <span class="close-btn" onclick="closeModal('m-analogico')">&times;</span>
+            <h2 class="modal-title">Nostalgia Digital: Os Anos 90/2000</h2>
+            <div class="dash-layout">
+                <div class="menu-col">
+                    <button class="tab-btn active" onclick="switchTab(event, 't-prof', 'analogico')">
+                        <i class="fa-solid fa-chalkboard"></i> A Vida dos Professores
+                    </button>
+                    <button class="tab-btn" onclick="switchTab(event, 't-banco', 'analogico')">
+                        <i class="fa-solid fa-building-columns"></i> A Saga Bancária
+                    </button>
+                    <button class="tab-btn" onclick="switchTab(event, 't-med', 'analogico')">
+                        <i class="fa-solid fa-stethoscope"></i> Medicina Raiz
+                    </button>
+                </div>
+                <div class="content-col">
+                    <div id="t-prof" class="tab-panel active analogico-p">
+                        <div class="text-side">
+                            <h3>Educação Sem Cliques</h3>
+                            <ul>
+                                <li><i class="fa-solid fa-chevron-right"></i> <strong>Quadro de Giz:</strong> O centro de toda dinâmica visual.</li>
+                                <li><i class="fa-solid fa-chevron-right"></i> <strong>Enciclopédias Físicas:</strong> Pesquisas longas em bibliotecas.</li>
+                                <li><i class="fa-solid fa-chevron-right"></i> <strong>Retroprojetor:</strong> O auge tecnológico das lâminas plásticas.</li>
+                                <li><i class="fa-solid fa-chevron-right"></i> <strong>Apostilas em Papel:</strong> Pilhas imensas e provas manuais.</li>
+                                <li><i class="fa-solid fa-chevron-right"></i> <strong>Revistas Especializadas:</strong> A única via de atualização.</li>
+                            </ul>
+                        </div>
+                        <div class="image-side"><img src="professor.jpg" alt="Professores"></div>
+                    </div>
+                    <div id="t-banco" class="tab-panel analogico-p">
+                        <div class="text-side">
+                            <h3>O Tempo que Parava</h3>
+                            <ul>
+                                <li><i class="fa-solid fa-clock"></i> <strong>Presença Física:</strong> Filas de horas em agências.</li>
+                                <li><i class="fa-solid fa-chevron-right"></i> <strong>Talão de Cheques:</strong> A ferramenta principal de compras.</li>
+                                <li><i class="fa-solid fa-chevron-right"></i> <strong>DOC Lento:</strong> Transferências que levavam dias.</li>
+                                <li><i class="fa-solid fa-chevron-right"></i> <strong>Cédulas em Papel:</strong> Tudo era resolvido no caixa físico.</li>
+                            </ul>
+                        </div>
+                        <div class="image-side"><img src="cheque.jpg" alt="Bancos"></div>
+                    </div>
+                    <div id="t-med" class="tab-panel analogico-p">
+                        <div class="text-side">
+                            <h3>Históricos no Arquivo</h3>
+                            <ul>
+                                <li><i class="fa-solid fa-chevron-right"></i> <strong>Fichários de Metal:</strong> Todo o histórico em pastas físicas.</li>
+                                <li><i class="fa-solid fa-chevron-right"></i> <strong>Receitas à Mão:</strong> Manuscritos muitas vezes ilegíveis.</li>
+                                <li><i class="fa-solid fa-chevron-right"></i> <strong>Exames em Filme:</strong> Revelação química lenta de chapas.</li>
+                                <li><i class="fa-solid fa-chevron-right"></i> <strong>Sem Telemedicina:</strong> Diagnóstico apenas 100% presencial.</li>
+                            </ul>
+                        </div>
+                        <div class="image-side"><img src="medico.jpg" alt="Medicina"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal" id="m-transicao">
+        <div class="modal-content">
+            <span class="close-btn" onclick="closeModal('m-transicao')">&times;</span>
+            <h2 class="modal-title">O Mercado em Metamorfose</h2>
+            <div class="dash-layout">
+                <div class="menu-col">
+                    <button class="tab-btn active" onclick="switchTab(event, 'tr-perigo', 'transicao')">
+                        <i class="fa-solid fa-skull-crossbones"></i> Profissões em Risco
+                    </button>
+                    <button class="tab-btn" onclick="switchTab(event, 'tr-novas', 'transicao')">
+                        <i class="fa-solid fa-bolt"></i> Carreiras em Ascensão
+                    </button>
+                </div>
+                <div class="content-col">
+                    <div id="tr-perigo" class="tab-panel active transicao-p">
+                        <div class="text-side">
+                            <h3 style="color: #ef4444;">Evoluir ou Desaparecer</h3>
+                            <p style="color: #94a3b8; margin-bottom: 20px;">Profissões que exigem profunda modificação para sobreviver:</p>
+                            <ul style="display: grid; grid-template-columns: 1fr; gap: 10px;">
+                                <li><i class="fa-solid fa-pen-nib"></i> <strong>Escrita & Edição:</strong> Redatores Técnicos, Tradutores, Intérpretes e Editores.</li>
+                                <li><i class="fa-solid fa-calculator"></i> <strong>Finanças:</strong> Contadores, Consultores Financeiros e Matemáticos.</li>
+                                <li><i class="fa-solid fa-headset"></i> <strong>Suporte:</strong> Telemarketing, SAC, Digitadores e Arquivistas.</li>
+                                <li><i class="fa-solid fa-hospital"></i> <strong>Saúde & Serviços:</strong> Radiologistas e Agentes de Viagem.</li>
+                            </ul>
+                        </div>
+                        <div class="image-side"><img src="riscos.jpg" alt="Riscos"></div>
+                    </div>
+                    <div id="tr-novas" class="tab-panel transicao-p">
+                        <div class="text-side">
+                            <h3>O Oceano Azul Digital</h3>
+                            <ul>
+                                <li><i class="fa-solid fa-star"></i> <strong>Cientistas de Dados & Programadores</strong></li>
+                                <li><i class="fa-solid fa-star"></i> <strong>Especialistas em IA & Robótica</strong></li>
+                                <li><i class="fa-solid fa-star"></i> <strong>Cyber Segurança & Defesa Digital</strong></li>
+                                <li><i class="fa-solid fa-star"></i> <strong>Game Designers & Mundos Virtuais</strong></li>
+                                <li><i class="fa-solid fa-star"></i> <strong>Engenheiros de Automação</strong></li>
+                            </ul>
+                        </div>
+                        <div class="image-side"><img src="futuro.jpg" alt="Futuro"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal" id="m-mitos">
+        <div class="modal-content">
+            <span class="close-btn" onclick="closeModal('m-mitos')">&times;</span>
+            <h2 class="modal-title">Desafio: Mitos ou Fatos?</h2>
+            <div class="cards-grid">
+                <div class="card" onclick="this.classList.toggle('flipped')"><div class="card-inner"><div class="card-front"><i class="fa-solid fa-user-secret" style="font-size: 40px; color: #38bdf8;"></i><h3>Modo anônimo garante privacidade?</h3></div><div class="card-back"><span class="status mito">Mito!</span><p>Só não salva no seu PC. Provedores continuam rastreando tudo.</p></div></div></div>
+                <div class="card" onclick="this.classList.toggle('flipped')"><div class="card-inner"><div class="card-front"><i class="fa-solid fa-shield-halved" style="font-size: 40px; color: #38bdf8;"></i><h3>Hacker pode ter profissão legal?</h3></div><div class="card-back"><span class="status fato">Fato!</span><p>Hackers Éticos são as mentes mais requisitadas para proteção hoje.</p></div></div></div>
+                <div class="card" onclick="this.classList.toggle('flipped')"><div class="card-inner"><div class="card-front"><i class="fa-solid fa-users-slash" style="font-size: 40px; color: #38bdf8;"></i><h3>Internet nos deixa menos sociais?</h3></div><div class="card-back"><span class="status mito">Mito!</span><p>Ela conecta culturas e fandoms globais. O isolamento é humano.</p></div></div></div>
+                <div class="card" onclick="this.classList.toggle('flipped')"><div class="card-inner"><div class="card-front"><i class="fa-solid fa-robot" style="font-size: 40px; color: #38bdf8;"></i><h3>IA substituirá todos os trabalhos?</h3></div><div class="card-back"><span class="status mito">Mito!</span><p>Automatiza o tédio, mas valoriza a decisão e empatia humana.</p></div></div></div>
+                <div class="card" onclick="this.classList.toggle('flipped')"><div class="card-inner"><div class="card-front"><i class="fa-solid fa-id-card" style="font-size: 40px; color: #38bdf8;"></i><h3>Postar afeta meu futuro emprego?</h3></div><div class="card-back"><span class="status fato">Fato!</span><p>A "Pegada Digital" é analisada por 90% dos RHs hoje.</p></div></div></div>
+                <div class="card" onclick="this.classList.toggle('flipped')"><div class="card-inner"><div class="card-front"><i class="fa-solid fa-gamepad" style="font-size: 40px; color: #38bdf8;"></i><h3>Jogos são perda de tempo?</h3></div><div class="card-back"><span class="status mito">Mito!</span><p>Treinam lógica e estratégia. É uma economia bilionária.</p></div></div></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal" id="m-futuro">
+        <div class="modal-content">
+            <span class="close-btn" onclick="closeModal('m-futuro')">&times;</span>
+            <h2 class="modal-title">O Multiverso Digital</h2>
+            <div class="multiverso-container">
+                <div class="pole pole-opps">
+                    <h3 style="color: #22c55e;"><i class="fa-solid fa-star"></i> Ouro Digital</h3>
+                    <ul>
+                        <li><i class="fa-solid fa-check"></i> Educação Universal (Harvard/MIT Online)</li>
+                        <li><i class="fa-solid fa-check"></i> Network Mundial Sem Fronteiras</li>
+                        <li><i class="fa-solid fa-check"></i> Novos Caminhos Profissionais Remotos</li>
+                    </ul>
+                </div>
+                <div class="pole pole-risks">
+                    <h3 style="color: #ef4444;"><i class="fa-solid fa-biohazard"></i> Zona de Risco</h3>
+                    <ul>
+                        <li><i class="fa-solid fa-xmark"></i> <strong>Fake News</strong></li>
+                        <li><i class="fa-solid fa-xmark"></i> <strong>Cyberbullying & Ansiedade Digital</strong></li>
+                        <li><i class="fa-solid fa-xmark"></i> <strong>Reputação Digital</strong></li>
+                        <li><i class="fa-solid fa-xmark"></i> <strong>Segurança Cibernética</strong></li>
+                    </ul>
+                    <button class="safety-btn" onclick="openSubModal('s-seguranca')">Ver Segurança: ECA & LGPD</button>
+                </div>
+            </div>
+            <div style="text-align: center;"><button class="advance-btn" onclick="goFinal()">Avançar <i class="fa-solid fa-chevron-right"></i></button></div>
+        </div>
+    </div>
+
+    <div class="sub-modal" id="s-seguranca">
+        <div class="sub-modal-content">
+            <span class="close-btn" style="top: 15px; right: 20px;" onclick="closeSubModal('s-seguranca')">&times;</span>
+            <i class="fa-solid fa-user-shield" style="font-size: 50px; color:#f59e0b; margin-bottom: 20px;"></i>
+            <h3 style="color:#fff; font-size: 24px; margin-bottom: 20px;">Proteção Legal Digital</h3>
+            <div style="text-align: left; background: #0f172a; padding: 25px; border-radius: 15px; width: 100%;">
+                <h4 style="color:#22c55e; margin-bottom: 10px;">ECA Digital (Ambiente Escolar)</h4>
+                <p style="font-size: 14px; color:#cbd5e1; margin-bottom: 20px; line-height: 1.5;">Focado no dever de cuidado das escolas e pais. Combate o Cyberbullying, protege a imagem dos alunos contra compartilhamento indevido e garante que a privacidade educacional seja prioridade. A escola agora é responsável legal pelo bem-estar digital.</p>
+                <h4 style="color:#38bdf8; margin-bottom: 10px;">LGPD</h4>
+                <p style="font-size: 14px; color:#cbd5e1; line-height: 1.5;">Garante que você controle quem coleta e como armazena seus dados pessoais e escolares. Seus cliques são seu patrimônio.</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal" id="m-final">
+        <div class="modal-content" style="border-color: #f59e0b;">
+            <span class="close-btn" onclick="closeModal('m-final')">&times;</span>
+            <h2 class="modal-title" style="color:#f59e0b; border-left-color:#f59e0b;">O Protagonista Digital</h2>
+            <div id="step-dicas" class="step active">
+                <div class="tips-grid">
+                    <div class="tip"><h4>Otimização Profissional</h4><p>Use a IA para automatizar o repetitivo e foque no estratégico e criativo.</p></div>
+                    <div class="tip"><h4>Marca & Portfólio</h4><p>Sua reputação digital é sua vitrine. Mostre seus projetos para o mundo.</p></div>
+                    <div class="tip"><h4>Network Global</h4><p>Siga mentores e inspiradores. Quebre barreiras geográficas.</p></div>
+                    <div class="tip"><h4>Curadoria Consciente</h4><p>Filtre o ruído. O conhecimento profundo é o que gera destaque real.</p></div>
+                </div>
+                <div style="text-align: center;"><button class="advance-btn" style="background:#38bdf8; color: #020617;" onclick="showThanks()">Avançar</button></div>
+            </div>
+            <div id="step-thanks" class="step">
+                <div class="contact-card">
+                    <i class="fa-solid fa-award" style="font-size: 70px; color:#22c55e; margin-bottom: 20px;"></i>
+                    <h2 style="color: #f8fafc;">Obrigado, Turma!</h2>
+                    <p style="color: #cbd5e1; margin-bottom: 30px;">Vocês são os protagonistas desta nova história.</p>
+                    <div style="display: inline-block; padding: 30px; background: rgba(30, 41, 59, 0.5); border-radius: 20px;">
+                        <h3 style="font-size: 32px; color:#fff;">Laércio Prates</h3>
+                        <p style="color:#22c55e; margin: 10px 0; font-family: 'Space Mono'; font-size: 20px;"><i class="fa-brands fa-instagram"></i> @connectmindsmarketing</p>
+                        <p style="color:#38bdf8; font-family: 'Space Mono'; font-size: 20px;"><i class="fa-brands fa-whatsapp"></i> 71 99740-9710</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function startPresentation() { document.getElementById('cover-screen').classList.add('hidden'); }
+        function backToCover() { document.getElementById('cover-screen').classList.remove('hidden'); }
+        function openModal(id) { document.getElementById(id).classList.add('active'); }
+        function closeModal(id) { document.getElementById(id).classList.remove('active'); }
+        function openSubModal(id) { document.getElementById(id).classList.add('active'); }
+        function closeSubModal(id) { document.getElementById(id).classList.remove('active'); }
+
+        function switchTab(evt, tabId, group) {
+            const contents = document.getElementsByClassName(group + '-p');
+            for (let i = 0; i < contents.length; i++) { contents[i].classList.remove('active'); contents[i].style.display = "none"; }
+            const buttons = evt.currentTarget.parentNode.getElementsByClassName("tab-btn");
+            for (let i = 0; i < buttons.length; i++) { buttons[i].classList.remove("active"); }
+            const activeTab = document.getElementById(tabId);
+            activeTab.style.display = "grid";
+            setTimeout(() => activeTab.classList.add('active'), 10);
+            evt.currentTarget.classList.add("active");
+        }
+
+        window.onload = function() {
+            document.querySelectorAll('.tab-panel').forEach(p => p.style.display = 'none');
+            document.querySelectorAll('.tab-panel.active').forEach(p => p.style.display = 'grid');
+        }
+
+        function goFinal() {
+            closeModal('m-futuro');
+            setTimeout(() => { 
+                document.getElementById('step-dicas').classList.add('active');
+                document.getElementById('step-thanks').classList.remove('active');
+                openModal('m-final'); 
+            }, 300);
+        }
+
+        function showThanks() {
+            document.getElementById('step-dicas').classList.remove('active');
+            document.getElementById('step-thanks').classList.add('active');
+        }
+
+        window.onclick = function(event) {
+            if (event.target.classList.contains('modal')) { closeModal(event.target.id); }
+            if (event.target.classList.contains('sub-modal')) { closeSubModal(event.target.id); }
+        }
+    </script>
+</body>
+</html>
